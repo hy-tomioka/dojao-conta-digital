@@ -1,0 +1,15 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0.26
+    environment:
+      MYSQL_ROOT_PASSWORD: zup
+      MYSQL_USER: zup
+      MYSQL_PASSWORD: zup
+      MYSQL_DATABASE: contas
+    ports:
+      - "3306:3306"
+    volumes:
+      - contas-volume:/var/lib/mysql
+volumes:
+  contas-volume:

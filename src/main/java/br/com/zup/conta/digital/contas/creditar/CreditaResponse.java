@@ -1,6 +1,6 @@
 package br.com.zup.conta.digital.contas.creditar;
 
-import java.math.BigDecimal;
+import br.com.zup.conta.digital.contas.compartilhado.Conta;
 
 public class CreditaResponse {
 

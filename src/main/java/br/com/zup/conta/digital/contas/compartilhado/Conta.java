@@ -1,9 +1,12 @@
-package br.com.zup.conta.digital.contas.creditar;
+package br.com.zup.conta.digital.contas.compartilhado;
+
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Entity
 public class Conta {
@@ -32,10 +35,11 @@ public class Conta {
     }
 
     public Boolean isDono(Long idCliente) {
-        return (cliente.getId() == idCliente);
+        return Objects.equals(cliente.getId(), idCliente);
     }
 
     public void credita(BigDecimal valor) {
+        Assert.isTrue(valor.compareTo(BigDecimal.ZERO) == 1, "Valor a ser creditado na conta deve ser positivo");
         this.saldo = saldo.add(valor);
     }
 
