@@ -28,10 +28,10 @@ public class Conta {
     public Conta() {
     }
 
-    public Conta(String numero, Cliente cliente, BigDecimal saldo) {
+    public Conta(String numero, Cliente cliente) {
         this.numero = numero;
         this.cliente = cliente;
-        this.saldo = saldo;
+        this.saldo = BigDecimal.ZERO;
     }
 
     public Boolean isDono(Long idCliente) {

@@ -9,4 +9,8 @@ public class CreditaResponse {
     public CreditaResponse(Conta conta) {
         idConta = conta.getId();
    }
+
+    public Long getIdConta() {
+        return idConta;
+    }
 }
