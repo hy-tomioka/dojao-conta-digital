@@ -16,6 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -41,26 +42,24 @@ class CreditaControllerTest {
 
     @BeforeEach
     void setUp() {
-        breno = new Cliente("Breno");
+        breno = new Cliente(UUID.randomUUID().toString(), "Breno");
         contaBreno = new Conta("1234", breno);
 
         entityManager.persist(breno);
         entityManager.persist(contaBreno);
     }
 
-
     @Test
     void deveCreditarValorNaConta() throws Exception {
 
-        CreditaRequest body = new CreditaRequest(breno.getId(), BigDecimal.valueOf(10.99));
+        CreditaRequest body = new CreditaRequest(BigDecimal.valueOf(10.99));
 
-        MockHttpServletRequestBuilder request = post("/api/v1/contas/1234/creditar")
+        MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + breno.getUuid() + "/contas/1234/saldo")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body));
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
-
     }
 
 }

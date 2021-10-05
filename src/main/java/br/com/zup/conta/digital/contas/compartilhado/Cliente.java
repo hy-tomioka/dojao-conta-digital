@@ -11,16 +11,23 @@ public class Cliente {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String uuid;
+
     private String nome;
 
     @Deprecated
     Cliente() {}
 
-    public Cliente(String nome) {
+    public Cliente(String uuid, String nome) {
         this.nome = nome;
+        this.uuid = uuid;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public String getUuid() {
+        return uuid;
     }
 }

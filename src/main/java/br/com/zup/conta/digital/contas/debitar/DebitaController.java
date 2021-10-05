@@ -1,12 +1,13 @@
-package br.com.zup.conta.digital.contas.creditar;
+package br.com.zup.conta.digital.contas.debitar;
 
 import br.com.zup.conta.digital.contas.compartilhado.Conta;
 import br.com.zup.conta.digital.contas.compartilhado.ContaRepository;
+import br.com.zup.conta.digital.contas.creditar.CreditaRequest;
+import br.com.zup.conta.digital.contas.creditar.CreditaResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,8 +17,7 @@ import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
-@Validated
-public class CreditaController {
+public class DebitaController {
 
     @Autowired
     ContaRepository contaRepository;
@@ -25,8 +25,8 @@ public class CreditaController {
     @Autowired
     TransactionTemplate transactionTemplate;
 
-    @PostMapping("api/v1/clientes/{idCliente}/contas/{numeroConta}/credito")
-    public ResponseEntity<CreditaResponse> creditar(@PathVariable String idCliente, @PathVariable String numeroConta, @Valid @RequestBody CreditaRequest request) {
+    @PostMapping("api/v1/clientes/{idCliente}/contas/{numeroConta}/debito")
+    public ResponseEntity<DebitaResponse> debitar(@PathVariable String idCliente, @PathVariable String numeroConta, @Valid @RequestBody DebitaRequest request) {
 
         return transactionTemplate.execute(status -> {
 
@@ -41,9 +41,9 @@ public class CreditaController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
-            conta.credita(request.getValor());
+            conta.debita(request.getValor());
 
-            return ResponseEntity.ok(new CreditaResponse(conta, request.getValor()));
+            return ResponseEntity.ok(new DebitaResponse(conta, request.getValor()));
         });
     }
 }

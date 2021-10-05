@@ -5,6 +5,7 @@ import org.springframework.util.Assert;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -34,13 +35,22 @@ public class Conta {
         this.saldo = BigDecimal.ZERO;
     }
 
-    public Boolean isDono(Long idCliente) {
-        return Objects.equals(cliente.getId(), idCliente);
+    public Boolean isDono(String idCliente) {
+        return Objects.equals(cliente.getUuid(), idCliente);
     }
 
-    public void credita(BigDecimal valor) {
+    public void credita(@Positive BigDecimal valor) {
         Assert.isTrue(valor.compareTo(BigDecimal.ZERO) == 1, "Valor a ser creditado na conta deve ser positivo");
         this.saldo = saldo.add(valor);
+    }
+
+    public Boolean debita(@Positive BigDecimal valor) {
+        Assert.isTrue(valor.compareTo(BigDecimal.ZERO) == 1, "Valor a ser debitado na conta dever ser positivo");
+        if(this.saldo.subtract(valor).compareTo(BigDecimal.ZERO) < 0){
+            return false;
+        }
+        this.saldo = this.saldo.subtract(valor);
+        return true;
     }
 
     public Long getId() {
