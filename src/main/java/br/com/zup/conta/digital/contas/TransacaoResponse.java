@@ -1,18 +1,16 @@
-package br.com.zup.conta.digital.contas.creditar;
-
-import br.com.zup.conta.digital.contas.compartilhado.Conta;
+package br.com.zup.conta.digital.contas;
 
 import java.math.BigDecimal;
 
-public class CreditaResponse {
+public class TransacaoResponse {
 
     private Long idConta;
-    private Long idCliente;
+    private String idCliente;
     private BigDecimal valor;
 
-    public CreditaResponse(Conta conta, BigDecimal valor) {
+    public TransacaoResponse(Conta conta, BigDecimal valor) {
         idConta = conta.getId();
-        idCliente = conta.getCliente().getId();
+        idCliente = conta.getIdCliente();
         this.valor = valor;
    }
 
@@ -20,7 +18,7 @@ public class CreditaResponse {
         return idConta;
     }
 
-    public Long getIdCliente() {
+    public String getIdCliente() {
         return idCliente;
     }
 

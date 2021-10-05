@@ -1,4 +1,4 @@
-package br.com.zup.conta.digital.contas.compartilhado;
+package br.com.zup.conta.digital.contas;
 
 import org.springframework.util.Assert;
 
@@ -18,9 +18,8 @@ public class Conta {
     @Column(unique = true) @NotBlank
     private String numero;
 
-    @NotNull
-    @ManyToOne
-    private Cliente cliente;
+    @NotBlank
+    private String idCliente;
 
     @NotNull
     private BigDecimal saldo;
@@ -29,14 +28,14 @@ public class Conta {
     public Conta() {
     }
 
-    public Conta(String numero, Cliente cliente) {
+    public Conta(String numero, String idCliente) {
         this.numero = numero;
-        this.cliente = cliente;
+        this.idCliente = idCliente;
         this.saldo = BigDecimal.ZERO;
     }
 
     public Boolean isDono(String idCliente) {
-        return Objects.equals(cliente.getUuid(), idCliente);
+        return this.idCliente.equalsIgnoreCase(idCliente);
     }
 
     public void credita(@Positive BigDecimal valor) {
@@ -57,8 +56,8 @@ public class Conta {
         return id;
     }
 
-    public Cliente getCliente() {
-        return cliente;
+    public String getIdCliente() {
+        return idCliente;
     }
 
     public BigDecimal getSaldo() {

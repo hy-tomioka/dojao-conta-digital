@@ -1,7 +1,7 @@
 package br.com.zup.conta.digital.contas.creditar;
 
-import br.com.zup.conta.digital.contas.compartilhado.Cliente;
-import br.com.zup.conta.digital.contas.compartilhado.Conta;
+import br.com.zup.conta.digital.contas.Conta;
+import br.com.zup.conta.digital.contas.TransacaoRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-
-class CreditaControllerTest {
+class TransacaoControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -34,7 +33,6 @@ class CreditaControllerTest {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private Cliente breno;
     private Conta contaBreno;
 
     @Autowired
@@ -42,19 +40,17 @@ class CreditaControllerTest {
 
     @BeforeEach
     void setUp() {
-        breno = new Cliente(UUID.randomUUID().toString(), "Breno");
-        contaBreno = new Conta("1234", breno);
+        contaBreno = new Conta("1234", UUID.randomUUID().toString());
 
-        entityManager.persist(breno);
         entityManager.persist(contaBreno);
     }
 
     @Test
     void deveCreditarValorNaConta() throws Exception {
 
-        CreditaRequest body = new CreditaRequest(BigDecimal.valueOf(10.99));
+        TransacaoRequest body = new TransacaoRequest(BigDecimal.valueOf(10.99));
 
-        MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + breno.getUuid() + "/contas/1234/saldo")
+        MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + contaBreno.getIdCliente() + "/contas/1234/credito")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body));
 

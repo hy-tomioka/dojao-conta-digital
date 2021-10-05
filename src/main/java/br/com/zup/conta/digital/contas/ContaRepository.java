@@ -1,4 +1,4 @@
-package br.com.zup.conta.digital.contas.compartilhado;
+package br.com.zup.conta.digital.contas;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

@@ -1,4 +1,4 @@
-package br.com.zup.conta.digital.contas.debitar;
+package br.com.zup.conta.digital.contas;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
@@ -8,17 +8,18 @@ import java.math.BigDecimal;
 
 import static com.fasterxml.jackson.annotation.JsonCreator.Mode.PROPERTIES;
 
-public class DebitaRequest {
-    @Positive
-    @NotNull
+public class TransacaoRequest {
+
+    @Positive @NotNull
     private BigDecimal valor;
 
     @JsonCreator(mode = PROPERTIES)
-    public DebitaRequest(BigDecimal valor) {
+    public TransacaoRequest(BigDecimal valor) {
         this.valor = valor;
     }
 
     public BigDecimal getValor() {
         return valor;
     }
+
 }
