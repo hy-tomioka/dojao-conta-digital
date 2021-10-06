@@ -5,67 +5,49 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.math.BigDecimal;
-import java.util.Optional;
-
-import static br.com.zup.conta.digital.contas.TipoTransacao.CREDITO;
-import static br.com.zup.conta.digital.contas.TipoTransacao.DEBITO;
 
 @RestController
 @Validated
+@RequestMapping("/api/v1/clientes/{idCliente}")
 public class TransacaoController {
 
     @Autowired
-    ContaRepository contaRepository;
+    private ContaRepository contaRepository;
 
     @Autowired
-    TransactionTemplate transactionTemplate;
+    private TransactionTemplate transactionTemplate;
 
-    @PostMapping("api/v1/clientes/{idCliente}/contas/{numeroConta}/credito")
-    public ResponseEntity<TransacaoResponse> creditar(
-            @PathVariable String idCliente,
-            @PathVariable String numeroConta,
-            @Valid @RequestBody TransacaoRequest request) {
-        return transacao(idCliente, numeroConta, request, CREDITO);
+    @PostMapping("/transacoes")
+    public ResponseEntity<TransacaoResponse> transacao(@PathVariable String idCliente, @Valid @RequestBody TransacaoRequest request) {
+        return transacao(idCliente, request, request.getTipoTransacao());
     }
 
-    @PostMapping("api/v1/clientes/{idCliente}/contas/{numeroConta}/debito")
-    public ResponseEntity<TransacaoResponse> debitar(
-            @PathVariable String idCliente,
-            @PathVariable String numeroConta,
-            @Valid @RequestBody TransacaoRequest request) {
-        return transacao(idCliente, numeroConta, request, DEBITO);
-    }
+    public ResponseEntity<TransacaoResponse> transacao(String idCliente, TransacaoRequest request, TipoTransacao tipoTransacao) {
+        Transacao transacaoFinalizada = transactionTemplate.execute(status -> {
+            valida(request, idCliente);
 
-    private ResponseEntity<TransacaoResponse> transacao(String idCliente, String numeroConta,
-                                                        TransacaoRequest request, TipoTransacao tipoTransacao) {
-        return transactionTemplate.execute(status -> {
+            Transacao transacao = request.toTransacao(tipoTransacao, contaRepository);
+            tipoTransacao.executa(transacao);
 
-            Optional<Conta> possivelConta = contaRepository.findByNumero(numeroConta);
-
-            if (possivelConta.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            Conta conta = possivelConta.get();
-            if (!conta.isDono(idCliente)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            }
-
-            BigDecimal valor = request.getValor();
-            boolean efetivada = tipoTransacao.efetiva(conta, valor);
-
-            if (!efetivada) {
-                return ResponseEntity.unprocessableEntity().build();
-            }
-
-            return ResponseEntity.ok(new TransacaoResponse(conta, valor));
+            return transacao;
         });
+
+        return ResponseEntity.ok(new TransacaoResponse(transacaoFinalizada));
+    }
+
+    private void valida(TransacaoRequest request, String idCliente) {
+        contaRepository.findByNumero(request.getNumeroConta())
+                .ifPresentOrElse(conta -> {
+                    if (!conta.isDono(idCliente)) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                    }
+                }, () -> {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                });
     }
 }

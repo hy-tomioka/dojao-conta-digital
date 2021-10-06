@@ -12,9 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +42,9 @@ public class TransacoesSimultaneasTest {
     private TransactionTemplate transactionTemplate;
 
     @Autowired
+    private TransacaoController transacaoController;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     private Conta contaBreno;
@@ -68,9 +70,11 @@ public class TransacoesSimultaneasTest {
     @Test
     void naoDevePermitirAExecucaoDeMultiplasOperacoesDeDebitoSimultaneas() throws Exception {
 
-        TransacaoRequest body = new TransacaoRequest(BigDecimal.valueOf(6.25));
+        TransacaoRequest body = new TransacaoRequest("1234", BigDecimal.valueOf(6.25), TipoTransacao.DEBITO);
 
-        MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + contaBreno.getIdCliente() + "/contas/1234/debito")
+        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes", contaBreno.getIdCliente()));
+
+        MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body));
 

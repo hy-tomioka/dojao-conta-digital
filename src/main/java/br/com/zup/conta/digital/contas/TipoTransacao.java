@@ -1,22 +1,27 @@
 package br.com.zup.conta.digital.contas;
 
-import java.math.BigDecimal;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 public enum TipoTransacao {
     CREDITO {
         @Override
-        boolean efetiva(Conta conta, BigDecimal valor) {
-            conta.credita(valor);
-
-            return true;
+        void executa(Transacao transacao) {
+            Conta conta = transacao.getConta();
+            conta.credita(transacao.getValor());
         }
     },
     DEBITO {
         @Override
-        boolean efetiva(Conta conta, BigDecimal valor) {
-            return conta.debita(valor);
+        void executa(Transacao transacao) {
+            Conta conta = transacao.getConta();
+            boolean sucesso = conta.debita(transacao.getValor());
+
+            if (!sucesso) {
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+            }
         }
     };
 
-    abstract boolean efetiva(Conta conta, BigDecimal valor);
+    abstract void executa(Transacao transacao);
 }

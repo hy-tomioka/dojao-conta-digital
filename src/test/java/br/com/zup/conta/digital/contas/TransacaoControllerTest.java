@@ -1,4 +1,4 @@
-package br.com.zup.conta.digital.contas.creditar;
+package br.com.zup.conta.digital.contas;
 
 import br.com.zup.conta.digital.contas.Conta;
 import br.com.zup.conta.digital.contas.ContaRepository;
@@ -17,11 +17,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,9 +45,11 @@ class TransacaoControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private final String numeroConta = "1234";
+
     @BeforeEach
     void setUp() {
-        contaBreno = new Conta("1234", UUID.randomUUID().toString());
+        contaBreno = new Conta(numeroConta, UUID.randomUUID().toString());
 
         entityManager.persist(contaBreno);
     }
@@ -55,9 +57,11 @@ class TransacaoControllerTest {
     @Test
     void deveCreditarValorNaConta() throws Exception {
 
-        TransacaoRequest body = new TransacaoRequest(BigDecimal.valueOf(10.99));
+        TransacaoRequest body = new TransacaoRequest(numeroConta, BigDecimal.valueOf(10.99), TipoTransacao.CREDITO);
 
-        MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + contaBreno.getIdCliente() + "/contas/1234/credito")
+        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes", contaBreno.getIdCliente()));
+
+        MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body));
 
@@ -74,9 +78,11 @@ class TransacaoControllerTest {
     void deveDebitarValorNaConta() throws Exception {
 
         contaBreno.credita(BigDecimal.valueOf(40.00));
-        TransacaoRequest body = new TransacaoRequest(BigDecimal.valueOf(10.0));
+        TransacaoRequest body = new TransacaoRequest(numeroConta, BigDecimal.valueOf(10.0), TipoTransacao.DEBITO);
 
-        MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + contaBreno.getIdCliente() + "/contas/1234/debito")
+        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes/", contaBreno.getIdCliente()));
+
+        MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body));
 
@@ -94,9 +100,11 @@ class TransacaoControllerTest {
     @Test
     void naoDeveDebitarValorNegativoNaConta() throws Exception {
 
-        TransacaoRequest body = new TransacaoRequest(BigDecimal.valueOf(-10.0));
+        TransacaoRequest body = new TransacaoRequest(numeroConta, BigDecimal.valueOf(-10.0), TipoTransacao.DEBITO);
 
-        MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + contaBreno.getIdCliente() + "/contas/1234/debito")
+        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes/", contaBreno.getIdCliente()));
+
+        MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body));
 
@@ -108,9 +116,11 @@ class TransacaoControllerTest {
     void naoDeveDebitarValorMaiorQueSaldoAtual() throws Exception {
 
 
-        TransacaoRequest body = new TransacaoRequest(BigDecimal.valueOf(10.0));
+        TransacaoRequest body = new TransacaoRequest(numeroConta, BigDecimal.valueOf(10.0), TipoTransacao.DEBITO);
 
-        MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + contaBreno.getIdCliente() + "/contas/1234/debito")
+        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes/", contaBreno.getIdCliente()));
+
+        MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(body));
 
