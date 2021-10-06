@@ -8,12 +8,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 
-@RestController
 @Validated
-@RequestMapping("/api/v1/clientes/{idCliente}")
+@RestController
+@RequestMapping("/api/v1/contas")
 public class TransacaoController {
 
     @Autowired
@@ -22,16 +21,13 @@ public class TransacaoController {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    @PostMapping("/transacoes")
-    public ResponseEntity<TransacaoResponse> transacao(@PathVariable String idCliente, @Valid @RequestBody TransacaoRequest request) {
-        return transacao(idCliente, request, request.getTipoTransacao());
-    }
-
-    public ResponseEntity<TransacaoResponse> transacao(String idCliente, TransacaoRequest request, TipoTransacao tipoTransacao) {
+    @PostMapping("/{numeroConta}")
+    public ResponseEntity<TransacaoResponse> transacao(@PathVariable String numeroConta, @Valid @RequestBody TransacaoRequest request) {
         Transacao transacaoFinalizada = transactionTemplate.execute(status -> {
-            valida(request, idCliente);
+            valida(numeroConta, request.getIdCliente());
 
-            Transacao transacao = request.toTransacao(tipoTransacao, contaRepository);
+            TipoTransacao tipoTransacao = request.getTipoTransacao();
+            Transacao transacao = request.toTransacao(numeroConta, tipoTransacao, contaRepository);
             tipoTransacao.executa(transacao);
 
             return transacao;
@@ -40,8 +36,8 @@ public class TransacaoController {
         return ResponseEntity.ok(new TransacaoResponse(transacaoFinalizada));
     }
 
-    private void valida(TransacaoRequest request, String idCliente) {
-        contaRepository.findByNumero(request.getNumeroConta())
+    private void valida(String numeroConta, String idCliente) {
+        contaRepository.findByNumero(numeroConta)
                 .ifPresentOrElse(conta -> {
                     if (!conta.isDono(idCliente)) {
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN);

@@ -58,9 +58,9 @@ class TransacaoControllerTest {
     @Test
     void deveCreditarValorNaConta() throws Exception {
 
-        TransacaoRequest body = new TransacaoRequest(numeroConta, BigDecimal.valueOf(10.99), TipoTransacao.CREDITO);
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(10.99), TipoTransacao.CREDITO);
 
-        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes", contaBreno.getIdCliente()));
+        URI uri = URI.create(String.format("/api/v1/contas/%s", contaBreno.getNumero()));
 
         MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -79,9 +79,9 @@ class TransacaoControllerTest {
     void deveDebitarValorNaConta() throws Exception {
 
         contaBreno.credita(BigDecimal.valueOf(40.00));
-        TransacaoRequest body = new TransacaoRequest(numeroConta, BigDecimal.valueOf(10.0), TipoTransacao.DEBITO);
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.TEN, TipoTransacao.DEBITO);
 
-        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes/", contaBreno.getIdCliente()));
+        URI uri = URI.create(String.format("/api/v1/contas/%s/", contaBreno.getNumero()));
 
         MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -101,9 +101,9 @@ class TransacaoControllerTest {
     @Test
     void naoDeveDebitarValorNegativoNaConta() throws Exception {
 
-        TransacaoRequest body = new TransacaoRequest(numeroConta, BigDecimal.valueOf(-10.0), TipoTransacao.DEBITO);
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(-10.0), TipoTransacao.DEBITO);
 
-        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes/", contaBreno.getIdCliente()));
+        URI uri = URI.create(String.format("/api/v1/contas/%s/", contaBreno.getNumero()));
 
         MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -117,9 +117,9 @@ class TransacaoControllerTest {
     void naoDeveDebitarValorMaiorQueSaldoAtual() throws Exception {
 
 
-        TransacaoRequest body = new TransacaoRequest(numeroConta, BigDecimal.valueOf(10.0), TipoTransacao.DEBITO);
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.TEN, TipoTransacao.DEBITO);
 
-        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes/", contaBreno.getIdCliente()));
+        URI uri = URI.create(String.format("/api/v1/contas/%s", contaBreno.getNumero()));
 
         MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -132,10 +132,10 @@ class TransacaoControllerTest {
     @Test
     void deveRetornar403ParaClienteQueNaoEDonoDaConta() throws Exception {
 
-        TransacaoRequest body = new TransacaoRequest(numeroConta, BigDecimal.valueOf(10.0), TipoTransacao.CREDITO);
-
         String idClienteInexistente = "00000000000000";
-        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes/", idClienteInexistente));
+        TransacaoRequest body = new TransacaoRequest(idClienteInexistente, BigDecimal.TEN, TipoTransacao.CREDITO);
+
+        URI uri = URI.create(String.format("/api/v1/contas/%s/", contaBreno.getNumero()));
 
         MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -148,10 +148,10 @@ class TransacaoControllerTest {
     @Test
     void deveRetornar404ParaContaInexistente() throws Exception {
 
-        String numeContaInexistente = "00000000";
-        TransacaoRequest body = new TransacaoRequest(numeContaInexistente, BigDecimal.valueOf(10.0), TipoTransacao.CREDITO);
+        String numeroContaInexistente = "00000000";
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(10.0), TipoTransacao.CREDITO);
 
-        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes/", contaBreno.getIdCliente()));
+        URI uri = URI.create(String.format("/api/v1/contas/%s/", numeroContaInexistente));
 
         MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)

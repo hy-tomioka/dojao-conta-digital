@@ -70,9 +70,9 @@ public class TransacoesSimultaneasTest {
     @Test
     void naoDevePermitirAExecucaoDeMultiplasOperacoesDeDebitoSimultaneas() throws Exception {
 
-        TransacaoRequest body = new TransacaoRequest("1234", BigDecimal.valueOf(6.25), TipoTransacao.DEBITO);
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(6.25), TipoTransacao.DEBITO);
 
-        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes", contaBreno.getIdCliente()));
+        URI uri = URI.create(String.format("/api/v1/contas/%s", contaBreno.getNumero()));
 
         MockHttpServletRequestBuilder request = post(uri)
                 .contentType(MediaType.APPLICATION_JSON)

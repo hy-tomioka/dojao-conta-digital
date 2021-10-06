@@ -14,22 +14,23 @@ import static com.fasterxml.jackson.annotation.JsonCreator.Mode.PROPERTIES;
 public class TransacaoRequest {
 
     @NotBlank
-    private String numeroConta;
+    private String idCliente;
 
-    @Positive @NotNull
+    @NotNull
+    @Positive
     private BigDecimal valor;
 
     @NotNull
     private TipoTransacao tipoTransacao;
 
     @JsonCreator(mode = PROPERTIES)
-    public TransacaoRequest(String numeroConta, BigDecimal valor, TipoTransacao tipoTransacao) {
-        this.numeroConta = numeroConta;
+    public TransacaoRequest(String idCliente, BigDecimal valor, TipoTransacao tipoTransacao) {
+        this.idCliente = idCliente;
         this.valor = valor;
         this.tipoTransacao = tipoTransacao;
     }
 
-    public Transacao toTransacao(TipoTransacao tipoTransacao, ContaRepository contaRepository) {
+    public Transacao toTransacao(String numeroConta, TipoTransacao tipoTransacao, ContaRepository contaRepository) {
 
         Conta conta = contaRepository.findByNumero(numeroConta)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -37,12 +38,12 @@ public class TransacaoRequest {
         return new Transacao(valor, tipoTransacao, conta);
     }
 
-    public BigDecimal getValor() {
-        return valor;
+    public String getIdCliente() {
+        return idCliente;
     }
 
-    public String getNumeroConta() {
-        return numeroConta;
+    public BigDecimal getValor() {
+        return valor;
     }
 
     public TipoTransacao getTipoTransacao() {
