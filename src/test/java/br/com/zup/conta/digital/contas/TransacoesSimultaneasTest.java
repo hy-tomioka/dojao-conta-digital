@@ -1,6 +1,7 @@
 package br.com.zup.conta.digital.contas;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,14 @@ public class TransacoesSimultaneasTest {
 
             entityManager.persist(contaBreno);
 
+            return status;
+        });
+    }
+
+    @AfterEach
+    void tearDown() {
+        transactionTemplate.execute(status -> {
+            contaRepository.deleteAll();
             return status;
         });
     }
