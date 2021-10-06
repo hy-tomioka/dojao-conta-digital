@@ -37,10 +37,6 @@ public class TransacoesSimultaneasTest {
     private MockMvc mockMvc;
 
     @Autowired
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    @Autowired
     private ContaRepository contaRepository;
 
     @Autowired
@@ -57,9 +53,7 @@ public class TransacoesSimultaneasTest {
             contaBreno = new Conta("1234", UUID.randomUUID().toString());
             contaBreno.credita(BigDecimal.valueOf(52.0));
 
-            entityManager.persist(contaBreno);
-
-            return status;
+            return contaRepository.save(contaBreno);
         });
     }
 
