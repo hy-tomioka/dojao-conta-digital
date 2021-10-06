@@ -70,7 +70,7 @@ public class TransacoesSimultaneasTest {
     @Test
     void naoDevePermitirAExecucaoDeMultiplasOperacoesDeDebitoSimultaneas() throws Exception {
 
-        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(6.25), TipoTransacao.DEBITO);
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(6.25), TipoTransacao.SAQUE);
 
         URI uri = URI.create(String.format("/api/v1/contas/%s", contaBreno.getNumero()));
 

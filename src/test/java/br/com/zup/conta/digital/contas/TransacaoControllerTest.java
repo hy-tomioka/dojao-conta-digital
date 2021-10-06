@@ -1,15 +1,11 @@
 package br.com.zup.conta.digital.contas;
 
-import br.com.zup.conta.digital.contas.Conta;
-import br.com.zup.conta.digital.contas.ContaRepository;
-import br.com.zup.conta.digital.contas.TransacaoRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Description;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -58,7 +54,7 @@ class TransacaoControllerTest {
     @Test
     void deveCreditarValorNaConta() throws Exception {
 
-        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(10.99), TipoTransacao.CREDITO);
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(10.99), TipoTransacao.DEPOSITO);
 
         URI uri = URI.create(String.format("/api/v1/contas/%s", contaBreno.getNumero()));
 
@@ -79,7 +75,7 @@ class TransacaoControllerTest {
     void deveDebitarValorNaConta() throws Exception {
 
         contaBreno.credita(BigDecimal.valueOf(40.00));
-        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.TEN, TipoTransacao.DEBITO);
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.TEN, TipoTransacao.SAQUE);
 
         URI uri = URI.create(String.format("/api/v1/contas/%s/", contaBreno.getNumero()));
 
@@ -101,7 +97,7 @@ class TransacaoControllerTest {
     @Test
     void naoDeveDebitarValorNegativoNaConta() throws Exception {
 
-        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(-10.0), TipoTransacao.DEBITO);
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(-10.0), TipoTransacao.SAQUE);
 
         URI uri = URI.create(String.format("/api/v1/contas/%s/", contaBreno.getNumero()));
 
@@ -117,7 +113,7 @@ class TransacaoControllerTest {
     void naoDeveDebitarValorMaiorQueSaldoAtual() throws Exception {
 
 
-        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.TEN, TipoTransacao.DEBITO);
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.TEN, TipoTransacao.SAQUE);
 
         URI uri = URI.create(String.format("/api/v1/contas/%s", contaBreno.getNumero()));
 
@@ -133,7 +129,7 @@ class TransacaoControllerTest {
     void deveRetornar403ParaClienteQueNaoEDonoDaConta() throws Exception {
 
         String idClienteInexistente = "00000000000000";
-        TransacaoRequest body = new TransacaoRequest(idClienteInexistente, BigDecimal.TEN, TipoTransacao.CREDITO);
+        TransacaoRequest body = new TransacaoRequest(idClienteInexistente, BigDecimal.TEN, TipoTransacao.DEPOSITO);
 
         URI uri = URI.create(String.format("/api/v1/contas/%s/", contaBreno.getNumero()));
 
@@ -149,7 +145,7 @@ class TransacaoControllerTest {
     void deveRetornar404ParaContaInexistente() throws Exception {
 
         String numeroContaInexistente = "00000000";
-        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(10.0), TipoTransacao.CREDITO);
+        TransacaoRequest body = new TransacaoRequest(contaBreno.getIdCliente(), BigDecimal.valueOf(10.0), TipoTransacao.DEPOSITO);
 
         URI uri = URI.create(String.format("/api/v1/contas/%s/", numeroContaInexistente));
 

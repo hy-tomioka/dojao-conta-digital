@@ -4,14 +4,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 public enum TipoTransacao {
-    CREDITO {
+    DEPOSITO {
         @Override
         void executa(Transacao transacao) {
             Conta conta = transacao.getConta();
             conta.credita(transacao.getValor());
         }
     },
-    DEBITO {
+    SAQUE {
         @Override
         void executa(Transacao transacao) {
             Conta conta = transacao.getConta();
