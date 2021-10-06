@@ -1,6 +1,7 @@
 package br.com.zup.conta.digital.contas.creditar;
 
 import br.com.zup.conta.digital.contas.Conta;
+import br.com.zup.conta.digital.contas.ContaRepository;
 import br.com.zup.conta.digital.contas.TransacaoRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,8 +17,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -28,6 +32,9 @@ class TransacaoControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ContaRepository repository;
 
     @Autowired
     @PersistenceContext
@@ -56,6 +63,56 @@ class TransacaoControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
+        Optional<Conta> possivelConta = repository.findById(contaBreno.getId());
+
+        assertTrue(possivelConta.get().getSaldo().compareTo(BigDecimal.valueOf(10.99)) == 0);
+
+    }
+
+    @Test
+    void deveDebitarValorNaConta() throws Exception {
+
+        contaBreno.credita(new BigDecimal(40.00));
+
+        TransacaoRequest body = new TransacaoRequest(BigDecimal.valueOf(10.0));
+
+        MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + contaBreno.getIdCliente() + "/contas/1234/debito")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(body));
+
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+
+         Optional<Conta> possivelConta = repository.findById(contaBreno.getId());
+         assertTrue(new BigDecimal(30.0).compareTo(possivelConta.get().getSaldo()) == 0);
+
+    }
+
+    @Test
+    void naoDeveDebitarValorNegativoNaConta() throws Exception {
+
+        TransacaoRequest body = new TransacaoRequest(BigDecimal.valueOf(-10.0));
+
+        MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + contaBreno.getIdCliente() + "/contas/1234/debito")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(body));
+
+        mockMvc.perform(request)
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void naoDeveDebitarValorMaiorQueSaldoAtual() throws Exception {
+
+
+        TransacaoRequest body = new TransacaoRequest(BigDecimal.valueOf(10.0));
+
+        MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + contaBreno.getIdCliente() + "/contas/1234/debito")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(body));
+
+        mockMvc.perform(request)
+                .andExpect(status().isUnprocessableEntity());
     }
 
 }
