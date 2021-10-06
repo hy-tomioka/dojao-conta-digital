@@ -20,8 +20,8 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,17 +63,17 @@ class TransacaoControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
+
         Optional<Conta> possivelConta = repository.findById(contaBreno.getId());
+        BigDecimal saldo = possivelConta.get().getSaldo();
 
-        assertTrue(possivelConta.get().getSaldo().compareTo(BigDecimal.valueOf(10.99)) == 0);
-
+        assertThat(BigDecimal.valueOf(10.99)).isEqualByComparingTo(saldo);
     }
 
     @Test
     void deveDebitarValorNaConta() throws Exception {
 
-        contaBreno.credita(new BigDecimal(40.00));
-
+        contaBreno.credita(BigDecimal.valueOf(40.00));
         TransacaoRequest body = new TransacaoRequest(BigDecimal.valueOf(10.0));
 
         MockHttpServletRequestBuilder request = post("/api/v1/clientes/" + contaBreno.getIdCliente() + "/contas/1234/debito")
@@ -83,8 +83,11 @@ class TransacaoControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isOk());
 
-         Optional<Conta> possivelConta = repository.findById(contaBreno.getId());
-         assertTrue(new BigDecimal(30.0).compareTo(possivelConta.get().getSaldo()) == 0);
+        Optional<Conta> possivelConta = repository.findById(contaBreno.getId());
+
+        BigDecimal saldo = possivelConta.get().getSaldo();
+
+        assertThat(BigDecimal.valueOf(30.0)).isEqualByComparingTo(saldo);
 
     }
 
