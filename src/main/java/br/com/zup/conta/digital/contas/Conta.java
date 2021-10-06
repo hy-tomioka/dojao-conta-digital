@@ -65,4 +65,7 @@ public class Conta {
         return saldo;
     }
 
+    public String getNumero() {
+        return numero;
+    }
 }

@@ -5,22 +5,22 @@ import java.util.UUID;
 
 public class TransacaoResponse {
 
-    private final Long idConta;
+    private final String numeroConta;
     private final String idCliente;
     private final UUID idTransacao;
     private final BigDecimal valor;
     private final TipoTransacao tipoTransacao;
 
     public TransacaoResponse(Transacao transacao) {
-        this.idConta = transacao.getConta().getId();
+        this.numeroConta = transacao.getConta().getNumero();
         this.idCliente = transacao.getConta().getIdCliente();
         this.idTransacao = transacao.getUuid();
         this.valor = transacao.getValor();
         this.tipoTransacao = transacao.getTipoTransacao();
    }
 
-    public Long getIdConta() {
-        return idConta;
+    public String getNumeroConta() {
+        return numeroConta;
     }
 
     public String getIdCliente() {
