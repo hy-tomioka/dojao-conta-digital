@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Description;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -126,6 +127,38 @@ class TransacaoControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    void deveRetornar403ParaClienteQueNaoEDonoDaConta() throws Exception {
+
+        TransacaoRequest body = new TransacaoRequest(numeroConta, BigDecimal.valueOf(10.0), TipoTransacao.CREDITO);
+
+        String idClienteInexistente = "00000000000000";
+        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes/", idClienteInexistente));
+
+        MockHttpServletRequestBuilder request = post(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(body));
+
+        mockMvc.perform(request)
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveRetornar404ParaContaInexistente() throws Exception {
+
+        String numeContaInexistente = "00000000";
+        TransacaoRequest body = new TransacaoRequest(numeContaInexistente, BigDecimal.valueOf(10.0), TipoTransacao.CREDITO);
+
+        URI uri = URI.create(String.format("/api/v1/clientes/%s/transacoes/", contaBreno.getIdCliente()));
+
+        MockHttpServletRequestBuilder request = post(uri)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(body));
+
+        mockMvc.perform(request)
+                .andExpect(status().isNotFound());
     }
 
 }
