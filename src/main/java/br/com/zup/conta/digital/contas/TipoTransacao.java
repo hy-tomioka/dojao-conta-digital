@@ -1,27 +1,23 @@
 package br.com.zup.conta.digital.contas;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import br.com.zup.conta.digital.contas.service.DepositoTransacaoService;
+import br.com.zup.conta.digital.contas.service.NovaTransacaoEvent;
+import br.com.zup.conta.digital.contas.service.SaqueTransacaoService;
+import br.com.zup.conta.digital.contas.service.TransacaoService;
 
-public enum TipoTransacao {
-    DEPOSITO {
-        @Override
-        void executa(Transacao transacao) {
-            Conta conta = transacao.getConta();
-            conta.credita(transacao.getValor());
-        }
-    },
-    SAQUE {
-        @Override
-        void executa(Transacao transacao) {
-            Conta conta = transacao.getConta();
-            boolean sucesso = conta.debita(transacao.getValor());
+public enum TipoTransacao implements NovaTransacaoEvent {
 
-            if (!sucesso) {
-                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
-            }
-        }
-    };
+    DEPOSITO(new DepositoTransacaoService()),
 
-    abstract void executa(Transacao transacao);
+    SAQUE(new SaqueTransacaoService());
+
+    private final TransacaoService transacaoService;
+
+    TipoTransacao(TransacaoService transacaoService) {
+        this.transacaoService = transacaoService;
+    }
+
+    public void executa(Transacao transacao) {
+        transacaoService.executa(transacao);
+    }
 }

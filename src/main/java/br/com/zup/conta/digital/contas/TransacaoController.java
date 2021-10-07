@@ -1,5 +1,6 @@
 package br.com.zup.conta.digital.contas;
 
+import br.com.zup.conta.digital.contas.service.TransacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +22,16 @@ public class TransacaoController {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    @Autowired
+    private TransacaoService transacaoService;
+
     @PostMapping("/{numeroConta}")
     public ResponseEntity<TransacaoResponse> transacao(@PathVariable String numeroConta, @Valid @RequestBody TransacaoRequest request) {
         Transacao transacaoFinalizada = transactionTemplate.execute(status -> {
             valida(numeroConta, request.getIdCliente());
 
-            TipoTransacao tipoTransacao = request.getTipoTransacao();
-            Transacao transacao = request.toTransacao(numeroConta, tipoTransacao, contaRepository);
-            tipoTransacao.executa(transacao);
+            Transacao transacao = request.toTransacao(numeroConta, contaRepository);
+            transacaoService.executa(transacao);
 
             return transacao;
         });

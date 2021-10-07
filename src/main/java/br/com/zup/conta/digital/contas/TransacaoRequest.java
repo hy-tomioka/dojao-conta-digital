@@ -30,7 +30,7 @@ public class TransacaoRequest {
         this.tipoTransacao = tipoTransacao;
     }
 
-    public Transacao toTransacao(String numeroConta, TipoTransacao tipoTransacao, ContaRepository contaRepository) {
+    public Transacao toTransacao(String numeroConta, ContaRepository contaRepository) {
 
         Conta conta = contaRepository.findByNumero(numeroConta)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
