@@ -11,7 +11,7 @@ import java.util.UUID;
 public class Transacao {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
