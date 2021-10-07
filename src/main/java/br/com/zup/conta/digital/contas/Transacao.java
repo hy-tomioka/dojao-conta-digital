@@ -4,6 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -24,6 +25,8 @@ public class Transacao {
     @Enumerated(EnumType.STRING)
     private final TipoTransacao tipoTransacao;
 
+    private Instant criadoEm = Instant.now();
+
     @ManyToOne(optional = false)
     private Conta conta;
 
@@ -43,6 +46,10 @@ public class Transacao {
 
     public TipoTransacao getTipoTransacao() {
         return tipoTransacao;
+    }
+
+    public Instant getCriadoEm() {
+        return criadoEm;
     }
 
     public Conta getConta() {

@@ -1,6 +1,7 @@
 package br.com.zup.conta.digital.contas;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 public class TransacaoResponse {
@@ -10,6 +11,7 @@ public class TransacaoResponse {
     private final UUID idTransacao;
     private final BigDecimal valor;
     private final TipoTransacao tipoTransacao;
+    private final Instant dataTransacao;
 
     public TransacaoResponse(Transacao transacao) {
         this.numeroConta = transacao.getConta().getNumero();
@@ -17,6 +19,7 @@ public class TransacaoResponse {
         this.idTransacao = transacao.getUuid();
         this.valor = transacao.getValor();
         this.tipoTransacao = transacao.getTipoTransacao();
+        this.dataTransacao = transacao.getCriadoEm();
    }
 
     public String getNumeroConta() {
@@ -37,5 +40,9 @@ public class TransacaoResponse {
 
     public TipoTransacao getTipoTransacao() {
         return tipoTransacao;
+    }
+
+    public Instant getDataTransacao() {
+        return dataTransacao;
     }
 }
