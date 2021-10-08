@@ -9,7 +9,7 @@ create table conta (
 );
 
 create table transacao (
-	id bigint not null,
+	id bigint not null auto_increment,
 	criado_em datetime(6) not null,
 	tipo_transacao varchar(255) not null,
 	uuid binary(255) not null unique,
