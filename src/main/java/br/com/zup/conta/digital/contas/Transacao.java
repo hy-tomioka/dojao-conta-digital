@@ -19,16 +19,19 @@ public class Transacao {
     private UUID uuid = UUID.randomUUID();
 
     @Positive
-    private final BigDecimal valor;
+    private BigDecimal valor;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private final TipoTransacao tipoTransacao;
+    private TipoTransacao tipoTransacao;
 
     private Instant criadoEm = Instant.now();
 
     @ManyToOne(optional = false)
     private Conta conta;
+
+    @Deprecated
+    Transacao() {}
 
     public Transacao(BigDecimal valor, TipoTransacao tipoTransacao, Conta conta) {
         this.valor = valor;
