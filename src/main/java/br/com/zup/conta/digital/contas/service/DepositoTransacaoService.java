@@ -9,5 +9,6 @@ public class DepositoTransacaoService implements TransacaoService {
     public void executa(Transacao transacao) {
         Conta conta = transacao.getConta();
         conta.credita(transacao.getValor());
+        conta.adicionaTransacao(transacao);
     }
 }

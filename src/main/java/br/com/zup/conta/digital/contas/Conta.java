@@ -3,6 +3,7 @@ package br.com.zup.conta.digital.contas;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -24,6 +25,10 @@ public class Conta {
 
     @NotNull
     private BigDecimal saldo;
+
+    @NotNull
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
+    private List<Transacao> transacoes = new ArrayList<>();
 
     @Deprecated
     public Conta() {
@@ -51,6 +56,10 @@ public class Conta {
         }
         this.saldo = this.saldo.subtract(valor);
         return true;
+    }
+
+    public void adicionaTransacao(@Valid @NotNull Transacao transacao) {
+        this.transacoes.add(transacao);
     }
 
     public Long getId() {

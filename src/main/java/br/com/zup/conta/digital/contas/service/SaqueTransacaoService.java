@@ -15,5 +15,7 @@ public class SaqueTransacaoService implements TransacaoService {
         if (!sucesso) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
+
+        conta.adicionaTransacao(transacao);
     }
 }
