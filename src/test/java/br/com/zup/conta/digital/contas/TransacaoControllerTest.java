@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -68,7 +70,13 @@ class TransacaoControllerTest {
         Optional<Conta> possivelConta = repository.findById(contaBreno.getId());
         BigDecimal saldo = possivelConta.get().getSaldo();
 
-        assertThat(BigDecimal.valueOf(10.99)).isEqualByComparingTo(saldo);
+        TypedQuery<Transacao> query = entityManager.createQuery("SELECT t FROM Conta c JOIN Transacao t ON c = t.conta WHERE c.id = :contaId", Transacao.class);
+        query.setParameter("contaId", contaBreno.getId());
+        Transacao transacao = query.getSingleResult();
+
+        assertThat(saldo).isEqualByComparingTo(BigDecimal.valueOf(10.99));
+        assertThat(transacao.getValor()).isEqualByComparingTo(BigDecimal.valueOf(10.99));
+        assertThat(transacao.getTipoTransacao()).isEqualTo(TipoTransacao.DEPOSITO);
     }
 
     @Test
@@ -90,8 +98,13 @@ class TransacaoControllerTest {
 
         BigDecimal saldo = possivelConta.get().getSaldo();
 
-        assertThat(BigDecimal.valueOf(30.0)).isEqualByComparingTo(saldo);
+        TypedQuery<Transacao> query = entityManager.createQuery("SELECT t FROM Conta c JOIN Transacao t ON c = t.conta WHERE c.id = :contaId", Transacao.class);
+        query.setParameter("contaId", contaBreno.getId());
+        Transacao transacao = query.getSingleResult();
 
+        assertThat(saldo).isEqualByComparingTo(BigDecimal.valueOf(30.0));
+        assertThat(transacao.getValor()).isEqualByComparingTo(BigDecimal.TEN);
+        assertThat(transacao.getTipoTransacao()).isEqualTo(TipoTransacao.SAQUE);
     }
 
     @Test
